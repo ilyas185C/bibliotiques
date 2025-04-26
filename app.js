@@ -9,9 +9,10 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Connexion à MongoDB
-mongoose.connect('mongodb://localhost:27017/bibliotheque', {
+await mongoose.connect(process.env.mongoConnection, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
+  dbName:"bibliotiques"
 })
 .then(() => console.log('Connexion à MongoDB réussie'))
 .catch(err => console.error('Erreur de connexion à MongoDB:', err));
