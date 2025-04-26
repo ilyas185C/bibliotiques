@@ -26,12 +26,20 @@ jobs:
           npm install
           npm run build --if-present
           npm run test --if-present
+          
+      - name: List files in workspace
+        run: |
+          echo "Files in root directory:"
+          dir
+          echo "Files in backend directory:"
+          dir backend
       
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: backend # Changed from "." to "backend" to match build directory
+          path: backend
+          if-no-files-found: error # This will make the workflow fail if no files are found
 
   deploy:
     runs-on: ubuntu-latest
@@ -49,13 +57,16 @@ jobs:
         with:
           name: node-app
       
+      - name: List downloaded files
+        run: ls -la
+      
       - name: Azure Login
         uses: azure/login@v1
         with:
           auth-type: SERVICE_PRINCIPAL
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }} # Added this line
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
 
       - name: 'Deploy to Azure Web App'
@@ -64,4 +75,4 @@ jobs:
         with:
           app-name: 'bibliotiques'
           slot-name: 'Production'
-          package: . # This should point to where your app files are after download
+          package: .
